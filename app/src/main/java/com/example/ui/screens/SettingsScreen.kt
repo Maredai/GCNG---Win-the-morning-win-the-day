@@ -21,6 +21,8 @@ import com.example.ui.theme.LocalThemeController
 @Composable
 fun SettingsScreen() {
     var notificationsEnabled by remember { mutableStateOf(false) }
+    var gradualVolume by remember { mutableStateOf(true) }
+    var smartSnooze by remember { mutableStateOf(false) }
     val themeController = LocalThemeController.current
 
     Scaffold(
@@ -47,25 +49,14 @@ fun SettingsScreen() {
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                SettingsSection("Preferences") {
-                    SettingsItem(
-                        icon = Icons.Outlined.NotificationsOff,
-                        title = "Notifications",
-                        subtitle = "Disabled — Open Settings",
-                        showDivider = true
-                    )
-                    SettingsItem(
-                        icon = Icons.Outlined.Language,
-                        title = "Language",
-                        trailingText = "us English",
-                        showDivider = true
-                    )
+                SettingsSection("Appearance") {
                     SettingsItem(
                         icon = Icons.Outlined.LightMode,
                         title = "Dark Mode",
+                        subtitle = "Toggle between light and dark theme",
                         showDivider = false,
                         trailingContent = {
-                            Checkbox(
+                            Switch(
                                 checked = themeController.isDarkTheme,
                                 onCheckedChange = { themeController.toggleTheme() }
                             )
@@ -75,46 +66,66 @@ fun SettingsScreen() {
             }
             
             item {
-                SettingsSection("Support") {
+                SettingsSection("Alarm Behaviors") {
                     SettingsItem(
-                        icon = Icons.Outlined.Lightbulb,
-                        title = "Request a Feature",
-                        showDivider = true
+                        icon = Icons.Outlined.VolumeUp,
+                        title = "Gradual Volume Ramp",
+                        subtitle = "Fade in over 30 seconds",
+                        showDivider = true,
+                        trailingContent = {
+                            Switch(
+                                checked = gradualVolume,
+                                onCheckedChange = { gradualVolume = it }
+                            )
+                        }
                     )
                     SettingsItem(
-                        icon = Icons.Outlined.HelpOutline,
-                        title = "Contact Support",
-                        showDivider = true
-                    )
-                    SettingsItem(
-                        icon = Icons.Outlined.ChatBubbleOutline,
-                        title = "Join our Discord",
-                        showDivider = false
-                    )
-                }
-            }
-            
-            item {
-                SettingsSection("Legal") {
-                    SettingsItem(
-                        icon = Icons.Outlined.Lock,
-                        title = "Privacy Policy",
-                        showDivider = true
-                    )
-                    SettingsItem(
-                        icon = Icons.Outlined.Description,
-                        title = "Terms of Service",
-                        showDivider = false
+                        icon = Icons.Outlined.Snooze,
+                        title = "Smart Snooze Cap",
+                        subtitle = "Limit to 1 snooze, increases task difficulty",
+                        showDivider = false,
+                        trailingContent = {
+                            Switch(
+                                checked = smartSnooze,
+                                onCheckedChange = { smartSnooze = it }
+                            )
+                        }
                     )
                 }
             }
             
             item {
-                SettingsSection("Account") {
+                SettingsSection("Preferences") {
                     SettingsItem(
-                        icon = Icons.Outlined.AccountCircle,
-                        title = "Account Settings",
-                        showDivider = false
+                        icon = Icons.Outlined.Language,
+                        title = "Language",
+                        subtitle = "English",
+                        showDivider = true,
+                        trailingContent = { } // Hide arrow
+                    )
+                    SettingsItem(
+                        icon = Icons.Outlined.Notifications,
+                        title = "Notifications",
+                        subtitle = "Manage app notifications",
+                        showDivider = false,
+                        trailingContent = {
+                            Switch(
+                                checked = notificationsEnabled,
+                                onCheckedChange = { notificationsEnabled = it }
+                            )
+                        }
+                    )
+                }
+            }
+            
+            item {
+                SettingsSection("App Info") {
+                    SettingsItem(
+                        icon = Icons.Outlined.Info,
+                        title = "GCNG v1.0",
+                        subtitle = "Privacy-First Morning Alarms",
+                        showDivider = false,
+                        trailingContent = { } // Hide arrow
                     )
                 }
             }
