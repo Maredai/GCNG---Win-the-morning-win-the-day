@@ -2,9 +2,12 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AutoGraph
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,19 +30,19 @@ fun MainScreen(
                 val currentRoute = navBackStackEntry?.destination?.route
                 
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(if (currentRoute == "home_tab") Icons.Filled.Home else Icons.Outlined.Home, contentDescription = "Home") },
                     label = { Text("Home") },
                     selected = currentRoute == "home_tab",
                     onClick = { bottomNavController.navigate("home_tab") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Info, contentDescription = "Stats") },
+                    icon = { Icon(if (currentRoute == "stats_tab") Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph, contentDescription = "Stats") },
                     label = { Text("Stats") },
                     selected = currentRoute == "stats_tab",
                     onClick = { bottomNavController.navigate("stats_tab") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    icon = { Icon(if (currentRoute == "settings_tab") Icons.Filled.Settings else Icons.Outlined.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") },
                     selected = currentRoute == "settings_tab",
                     onClick = { bottomNavController.navigate("settings_tab") }
