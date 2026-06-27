@@ -1,0 +1,6 @@
+{
+  "name": "GCNG",
+  "description": "Privacy-first alarm app that forces users to complete tasks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
