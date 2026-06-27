@@ -21,11 +21,6 @@ fun StatsScreen() {
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("GCNG", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.primary)
-                    }
-                },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(Icons.Default.Person, contentDescription = "Profile", tint = MaterialTheme.colorScheme.primary)
