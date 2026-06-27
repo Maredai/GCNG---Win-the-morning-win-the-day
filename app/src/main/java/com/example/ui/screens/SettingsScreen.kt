@@ -29,11 +29,6 @@ fun SettingsScreen() {
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Settings", style = MaterialTheme.typography.titleLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.primary)
-                    }
-                },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(Icons.Outlined.AccountCircle, contentDescription = "Profile", tint = MaterialTheme.colorScheme.primary)
