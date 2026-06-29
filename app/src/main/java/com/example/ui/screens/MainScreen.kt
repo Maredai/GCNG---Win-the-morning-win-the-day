@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AutoGraph
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -47,6 +49,12 @@ fun MainScreen(
                     selected = currentRoute == "settings_tab",
                     onClick = { bottomNavController.navigate("settings_tab") }
                 )
+                NavigationBarItem(
+                    icon = { Icon(if (currentRoute == "profile_tab") Icons.Filled.Person else Icons.Outlined.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = currentRoute == "profile_tab",
+                    onClick = { bottomNavController.navigate("profile_tab") }
+                )
             }
         }
     ) { innerPadding ->
@@ -63,6 +71,9 @@ fun MainScreen(
             }
             composable("settings_tab") {
                 SettingsScreen()
+            }
+            composable("profile_tab") {
+                ProfileScreen()
             }
         }
     }
