@@ -28,6 +28,38 @@ fun AlarmSetupScreen(
     var alarmName by remember { mutableStateOf("Morning Alarm") }
     var alarmTime by remember { mutableStateOf("07:30 AM") }
     var isScheduled by remember { mutableStateOf(true) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    
+    val timePickerState = rememberTimePickerState(
+        initialHour = 7,
+        initialMinute = 30,
+        is24Hour = false
+    )
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val amPm = if (timePickerState.hour >= 12) "PM" else "AM"
+                    val hr = if (timePickerState.hour % 12 == 0) 12 else timePickerState.hour % 12
+                    val min = timePickerState.minute.toString().padStart(2, '0')
+                    alarmTime = String.format("%02d:%s %s", hr, min, amPm)
+                    showTimePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text("Cancel")
+                }
+            },
+            text = {
+                TimePicker(state = timePickerState)
+            }
+        )
+    }
     
     val days = listOf("S", "M", "T", "W", "T", "F", "S")
     val selectedDays = remember { mutableStateListOf(1, 2, 3, 4, 5) }
@@ -52,9 +84,9 @@ fun AlarmSetupScreen(
                     onClick = onSave,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(24.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSurface)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Save Alarm", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("Save Alarm", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
             }
         },
@@ -73,10 +105,22 @@ fun AlarmSetupScreen(
             item {
                 AlarmCard {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(alarmName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                        TextField(
+                            value = alarmName,
+                            onValueChange = { alarmName = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface),
+                            singleLine = true
+                        )
                     }
                 }
             }
@@ -85,12 +129,15 @@ fun AlarmSetupScreen(
             item {
                 AlarmCard {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showTimePicker = true }
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Alarm Time", style = MaterialTheme.typography.titleMedium)
-                        Text(alarmTime, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(alarmTime, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -104,29 +151,29 @@ fun AlarmSetupScreen(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(if (isScheduled) MaterialTheme.colorScheme.onSurface else Color.Transparent)
+                                .background(if (isScheduled) MaterialTheme.colorScheme.primary else Color.Transparent)
                                 .clickable { isScheduled = true }
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Outlined.Repeat, contentDescription = null, tint = if (isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
+                                Icon(Icons.Outlined.Repeat, contentDescription = null, tint = if (isScheduled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Scheduled", color = if (isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                                Text("Scheduled", color = if (isScheduled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                             }
                         }
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(if (!isScheduled) MaterialTheme.colorScheme.onSurface else Color.Transparent)
+                                .background(if (!isScheduled) MaterialTheme.colorScheme.primary else Color.Transparent)
                                 .clickable { isScheduled = false }
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Outlined.CalendarToday, contentDescription = null, tint = if (!isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
+                                Icon(Icons.Outlined.CalendarToday, contentDescription = null, tint = if (!isScheduled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("One-time", color = if (!isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                                Text("Once", color = if (!isScheduled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -150,7 +197,7 @@ fun AlarmSetupScreen(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(CircleShape)
-                                            .background(if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceVariant)
+                                            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                             .clickable {
                                                 if (isSelected) selectedDays.remove(index) else selectedDays.add(index)
                                             },
@@ -158,7 +205,7 @@ fun AlarmSetupScreen(
                                     ) {
                                         Text(
                                             text = day,
-                                            color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
