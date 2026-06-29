@@ -5,17 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,259 +25,271 @@ fun AlarmSetupScreen(
     onBack: () -> Unit,
     onSave: () -> Unit
 ) {
-    var selectedAmPm by remember { mutableStateOf("AM") }
+    var alarmName by remember { mutableStateOf("Morning Alarm") }
+    var alarmTime by remember { mutableStateOf("07:30 AM") }
+    var isScheduled by remember { mutableStateOf(true) }
     
-    val days = listOf("M", "T", "W", "T", "F", "S", "S")
-    val selectedDays = remember { mutableStateListOf<Int>(0, 1, 2, 3, 4) }
+    val days = listOf("S", "M", "T", "W", "T", "F", "S")
+    val selectedDays = remember { mutableStateListOf(1, 2, 3, 4, 5) }
     
-    val tasks = listOf("Math Solver", "Memory Match", "Verse Copy", "Smile Cam", "Head Shake", "Rapid Blink", "10 Jumps", "Scan Random Item", "Color Finder", "Audio Affirmation")
-    var selectedTask by remember { mutableStateOf(tasks[0]) }
-    var vibrate by remember { mutableStateOf(true) }
-    var snooze by remember { mutableStateOf(true) }
+    var bedtimeReminder by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("New Alarm", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
+                title = { Text("Edit Alarm", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    IconButton(onClick = onBack, modifier = Modifier.padding(start = 8.dp).background(MaterialTheme.colorScheme.surface, CircleShape)) {
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
-                actions = {
-                    TextButton(onClick = onSave) {
-                        Text("Save", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        bottomBar = {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSurface)
+                ) {
+                    Text("Save Alarm", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            contentPadding = PaddingValues(bottom = 80.dp, top = 24.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
         ) {
+            
+            // Alarm Name
             item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "07 : 30",
-                        style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold, fontSize = 64.sp),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                AlarmCard {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        FilterChip(
-                            selected = selectedAmPm == "AM",
-                            onClick = { selectedAmPm = "AM" },
-                            label = { Text("AM", fontWeight = FontWeight.Bold) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                        )
-                        FilterChip(
-                            selected = selectedAmPm == "PM",
-                            onClick = { selectedAmPm = "PM" },
-                            label = { Text("PM", fontWeight = FontWeight.Bold) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                        )
+                        Text(alarmName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                     }
                 }
             }
-
+            
+            // Alarm Time
             item {
-                Text("Repeat", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    days.forEachIndexed { index, day ->
-                        val isSelected = selectedDays.contains(index)
+                AlarmCard {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Alarm Time", style = MaterialTheme.typography.titleMedium)
+                        Text(alarmTime, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            
+            // Scheduled / One-time toggle
+            item {
+                AlarmCard {
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-                                .clickable {
-                                    if (isSelected) selectedDays.remove(index) else selectedDays.add(index)
-                                },
+                                .weight(1f)
+                                .background(if (isScheduled) MaterialTheme.colorScheme.onSurface else Color.Transparent)
+                                .clickable { isScheduled = true }
+                                .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = day,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.Repeat, contentDescription = null, tint = if (isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Scheduled", color = if (isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(if (!isScheduled) MaterialTheme.colorScheme.onSurface else Color.Transparent)
+                                .clickable { isScheduled = false }
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.CalendarToday, contentDescription = null, tint = if (!isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("One-time", color = if (!isScheduled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             }
-
+            
+            // Repeat On
+            if (isScheduled) {
+                item {
+                    AlarmCard {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Repeat on:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                days.forEachIndexed { index, day ->
+                                    val isSelected = selectedDays.contains(index)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape)
+                                            .background(if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceVariant)
+                                            .clickable {
+                                                if (isSelected) selectedDays.remove(index) else selectedDays.add(index)
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = day,
+                                            color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Wake-Up Tasks
             item {
-                Card(
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                AlarmCard {
+                    Column {
+                        TaskItem("Task 1", "Math Solver", Icons.Outlined.Calculate, showDivider = true)
+                        TaskItem("Task 2", "Smile Cam", Icons.Outlined.CameraAlt, showDivider = true)
+                        TaskItem("Task 3", "Audio Affirmation", Icons.Outlined.Mic, showDivider = false)
+                    }
+                }
+            }
+            
+            // Sound
+            item {
+                AlarmCard {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(modifier = Modifier.size(40.dp).background(Color(0xFFE57373), CircleShape))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Sound", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Morning Rain", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                        }
+                        Icon(Icons.Outlined.ChevronRight, contentDescription = "More", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            
+            // Wake-up Check
+            item {
+                AlarmCard {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Outlined.Refresh, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Wake-up Check", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+                                    Text("Off", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                }
+                            }
+                            Text("A second alarm so you don't fall back asleep", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Icon(Icons.Outlined.ChevronRight, contentDescription = "More", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            
+            // Sleep Better
+            item {
+                AlarmCard {
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Vibrate", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                            Switch(checked = vibrate, onCheckedChange = { vibrate = it }, colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary))
+                            Icon(Icons.Outlined.Bedtime, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text("Sleep Better", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                            Icon(Icons.Outlined.ChevronRight, contentDescription = "More", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Snooze (5 mins)", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                            Switch(checked = snooze, onCheckedChange = { snooze = it }, colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary))
-                        }
-                    }
-                }
-            }
-
-            item {
-                val soundCategories = mapOf(
-                    "Nature & Calm" to listOf("Morning Rain", "Forest Awakening", "Gentle Breeze"),
-                    "Standard" to listOf("Classic Bell", "Digital Beep")
-                )
-                
-                var selectedSound by remember { mutableStateOf("Morning Rain") }
-                
-                soundCategories.forEach { (category, sounds) ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                            Text(category, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
-                            Spacer(modifier = Modifier.height(8.dp))
-                            sounds.forEach { sound ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { selectedSound = sound }
-                                        .padding(vertical = 12.dp, horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Text(sound, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                                    }
-                                    RadioButton(
-                                        selected = (sound == selectedSound),
-                                        onClick = { selectedSound = sound },
-                                        colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary, unselectedColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                                    )
-                                }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Bedtime Reminder", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                                Text("A gentle alarm and notification will remind you it's time for bed", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Wake-Up Task", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                val taskCategories = mapOf(
-                    "Mental & Logic" to listOf("Math Solver", "Memory Match", "Verse Copy"),
-                    "Physical Actions" to listOf("Smile Cam", "Head Shake", "Rapid Blink", "10 Jumps"),
-                    "Real World Interaction" to listOf("Scan Random Item", "Color Finder", "Audio Affirmation")
-                )
-                
-                var selectedTask by remember { mutableStateOf("Math Solver") }
-
-                taskCategories.forEach { (category, categoryTasks) ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(category, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            categoryTasks.forEach { task ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-                                        .clickable { selectedTask = task }
-                                        .padding(vertical = 8.dp, horizontal = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    RadioButton(
-                                        selected = (task == selectedTask),
-                                        onClick = { selectedTask = task }
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(task, style = MaterialTheme.typography.bodyLarge)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Difficulty Level", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                val levels = listOf("Easy", "Medium", "Hard", "Auto-Scaling")
-                var selectedLevel by remember { mutableStateOf(levels[3]) }
-                
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        levels.forEach { level ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-                                    .clickable { selectedLevel = level }
-                                    .padding(vertical = 8.dp, horizontal = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = (level == selectedLevel),
-                                    onClick = { selectedLevel = level }
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(level, style = MaterialTheme.typography.bodyLarge)
-                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Switch(checked = bedtimeReminder, onCheckedChange = { bedtimeReminder = it })
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AlarmCard(content: @Composable () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun TaskItem(label: String, taskName: String, icon: androidx.compose.ui.graphics.vector.ImageVector, showDivider: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable {}.padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(taskName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        }
+        if (showDivider) {
+            Icon(Icons.Outlined.ChevronRight, contentDescription = "More", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            Icon(Icons.Outlined.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+    if (showDivider) {
+        HorizontalDivider(modifier = Modifier.padding(start = 64.dp, end = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
     }
 }
