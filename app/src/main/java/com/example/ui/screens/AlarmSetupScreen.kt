@@ -19,9 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import com.example.viewmodel.AlarmViewModel
+import com.example.data.Alarm
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlarmSetupScreen(
+    viewModel: AlarmViewModel,
     onBack: () -> Unit,
     onSave: () -> Unit
 ) {
@@ -81,7 +85,19 @@ fun AlarmSetupScreen(
         bottomBar = {
             Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Button(
-                    onClick = onSave,
+                    onClick = {
+                        val amPm = alarmTime.split(" ").last()
+                        val timeOnly = alarmTime.split(" ").first()
+                        val newAlarm = Alarm(
+                            time = timeOnly,
+                            amPm = amPm,
+                            label = alarmName,
+                            isEnabled = true,
+                            isScheduled = isScheduled
+                        )
+                        viewModel.saveAlarm(newAlarm)
+                        onSave()
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)

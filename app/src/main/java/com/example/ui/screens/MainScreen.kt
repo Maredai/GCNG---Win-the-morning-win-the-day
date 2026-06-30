@@ -17,9 +17,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.viewmodel.AlarmViewModel
 
 @Composable
 fun MainScreen(
+    viewModel: AlarmViewModel,
     onNavigateToSetup: () -> Unit,
     onNavigateToRing: () -> Unit
 ) {
@@ -64,7 +66,7 @@ fun MainScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home_tab") {
-                HomeScreen(onNavigateToSetup = onNavigateToSetup, onTestAlarm = onNavigateToRing)
+                HomeScreen(viewModel = viewModel, onNavigateToSetup = onNavigateToSetup, onTestAlarm = onNavigateToRing)
             }
             composable("stats_tab") {
                 StatsScreen()

@@ -23,21 +23,37 @@ fun AuthScreen(onLoginSuccess: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var errorText by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    val fullText = "Win the morning,\nWin the day"
+    var animatedText by remember { mutableStateOf("") }
+    
+    LaunchedEffect(fullText) {
+        for (i in fullText.indices) {
+            animatedText = fullText.substring(0, i + 1)
+            kotlinx.coroutines.delay(60)
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFFF2F2FD) // Light violet background
     ) {
-        androidx.compose.foundation.Image(
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            androidx.compose.foundation.Image(
             painter = androidx.compose.ui.res.painterResource(id = com.example.R.drawable.logo_purple),
             contentDescription = "GCNG Logo",
             modifier = Modifier.size(120.dp)
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Welcome Back", 
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold
+            text = animatedText, 
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 40.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             ),
             color = MaterialTheme.colorScheme.primary
         )
@@ -167,4 +183,5 @@ fun AuthScreen(onLoginSuccess: () -> Unit) {
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
+}
 }

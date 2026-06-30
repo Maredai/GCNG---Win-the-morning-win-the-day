@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.ui.unit.sp
@@ -22,25 +23,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
-data class Alarm(
-    val id: String = java.util.UUID.randomUUID().toString(),
-    val time: String,
-    val amPm: String,
-    val label: String,
-    val isEnabled: Boolean
-)
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.data.Alarm
+import com.example.viewmodel.AlarmViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
-    val alarms = remember {
-        mutableStateListOf(
-            Alarm(time = "06:00", amPm = "AM", label = "Morning Run", isEnabled = true),
-            Alarm(time = "07:30", amPm = "AM", label = "Backup", isEnabled = false),
-            Alarm(time = "10:00", amPm = "PM", label = "Wind Down Reminder", isEnabled = true)
-        )
-    }
+fun HomeScreen(viewModel: AlarmViewModel, onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
+    val alarms by viewModel.alarms.collectAsStateWithLifecycle()
 
     var isSelectionMode by remember { mutableStateOf(false) }
     var selectedAlarmIds by remember { mutableStateOf(setOf<String>()) }
@@ -59,8 +49,17 @@ fun HomeScreen(onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
                         }
                     },
                     actions = {
+                        if (selectedAlarmIds.size == 1) {
+                            IconButton(onClick = {
+                                isSelectionMode = false
+                                selectedAlarmIds = emptySet()
+                                onNavigateToSetup() // You might want to pass ID to edit
+                            }) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
                         IconButton(onClick = { 
-                            alarms.removeAll { it.id in selectedAlarmIds }
+                            viewModel.deleteAlarms(selectedAlarmIds)
                             isSelectionMode = false
                             selectedAlarmIds = emptySet()
                         }) {
@@ -147,7 +146,7 @@ fun HomeScreen(onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
                         if (it == SwipeToDismissBoxValue.EndToStart) {
-                            alarms.remove(alarm)
+                            viewModel.deleteAlarms(setOf(alarm.id))
                             true
                         } else {
                             false
@@ -187,6 +186,8 @@ fun HomeScreen(onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
                                             } else {
                                                 selectedAlarmIds = selectedAlarmIds + alarm.id
                                             }
+                                        } else {
+                                            onNavigateToSetup()
                                         }
                                     },
                                     onLongClick = {
@@ -214,10 +215,7 @@ fun HomeScreen(onNavigateToSetup: () -> Unit, onTestAlarm: () -> Unit) {
                                 Switch(
                                     checked = alarm.isEnabled,
                                     onCheckedChange = { isChecked ->
-                                        val index = alarms.indexOf(alarm)
-                                        if (index != -1) {
-                                            alarms[index] = alarm.copy(isEnabled = isChecked)
-                                        }
+                                        viewModel.toggleAlarm(alarm.id, isChecked)
                                     },
                                     colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary)
                                 )
